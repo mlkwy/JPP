@@ -1,4 +1,4 @@
 
 public class Server {
-1;xs
+	System.out.println("Hello, WOrld!");
 }
