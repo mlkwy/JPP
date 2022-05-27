@@ -1,16 +1,15 @@
 import java.util.ArrayList;
 
 public class Room {
-	ArrayList<User> user_list; // List containing users in the room
+	ArrayList<User> user_list; // 리스트에 사용자 저장
 	
 	Room(String name) {
 		user_list=new ArrayList<User>();
 	}
 	
-	public int count()
-	{
+	public int count() {
 		return this.user_list.size();
-	} // Returns the number of people in the room
+	} // 방에 있는 사용자 수를 리턴 
 	
 	public void addUser(User new_user) {
 		if(user_list.isEmpty())
@@ -37,12 +36,12 @@ public class Room {
 				}	
 				
 				break;
-			} // If 'John' exists, 'John1', 'John2', 'John3' ...
+			} // 'John'이 방에 이미 존재하면 'John1', 'John2', 'John3' ...
 				
 		user_list.add(new_user);
 	} // Adds a user in the room
 	
 	public void removeUser(User target_user) {
 		user_list.remove(target_user);
-	} // Remove specific user in the room
+	} // 특정 사용자를 방에서 제거
 }
