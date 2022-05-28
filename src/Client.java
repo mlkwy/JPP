@@ -21,38 +21,28 @@ import javax.swing.JTextField;
 
 public class Client {
 	static Socket socket;
-	
 	static ChatRoomFrame client_frame;
-	
 	static String name;
 	static Boolean is_leader;
 	static Boolean is_muted;
 	static ArrayList<String> client_list;
 
-	public static void main(String args[]) throws UnknownHostException, IOException
+	Client(Socket socket, String name)
 	{	
+		Client.socket=socket;
+		Client.name=name;
 		is_leader=false;
 		is_muted=false;
 		client_list=new ArrayList<String>();
+		client_frame=new ChatRoomFrame();
 		
-		name = "Kidm";
-		socket = new Socket("localhost", 100);
-		
-		client_frame=new ChatRoomFrame(socket, name, is_leader, client_list);
-		
-		new SendToServer(socket, "Joined`"+getName()).start();
 		new ReceiveFromServer(socket, client_frame).start();
 	}
-
 	
 	public static String getName() {
-		return Client.name;
+		return name;
 	}
-	
-	public static void setName(String name) {
-		Client.name = name;
-	}
-	
+		
 	public static Boolean isLeader() {
 		return is_leader;
 	}
@@ -68,7 +58,6 @@ public class Client {
 	public static void setMuted() {
 		is_muted=!is_muted;
 	}
-
 }
 
 class SendToServer extends Thread {
@@ -86,7 +75,7 @@ class SendToServer extends Thread {
 			dos.writeUTF(message);
 		}catch (IOException e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 		}	
 	}
 }
@@ -116,9 +105,9 @@ class ReceiveFromServer extends Thread {
 			if(command.equals("Message"))
 			{
 				if(name.equals(Client.getName()))
-					printed_message = "Me: " + message;
+					printed_message = "[Me] " + message;
 				else
-					printed_message = name + ": " + message;
+					printed_message = "[" + name + "] " + message;
 			}
 				
 			else if(command.equals("Joined"))
@@ -174,7 +163,6 @@ class ReceiveFromServer extends Thread {
 					String s = token.nextToken();
 					Client.client_list.add(s.trim());
 				}
-				client_frame.setList(Client.client_list);
 			}
 			
 			if(!printed_message.equals(""))
@@ -183,7 +171,7 @@ class ReceiveFromServer extends Thread {
 			
 		}catch (IOException e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 }

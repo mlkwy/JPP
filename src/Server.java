@@ -21,7 +21,7 @@ public class Server {
 		array_client_list=new ArrayList<String>();
 		is_leader_decided=false;
 		try {
-			server_socket = new ServerSocket(100);
+			server_socket = new ServerSocket(1000);
 			System.out.println("Server ready.");
 			
 			thread_list = new ArrayList<ReceiveFromClientsThread>();
@@ -111,10 +111,11 @@ public class Server {
 							if(array_client_list.contains(name)) {
 								System.out.println("User name collides");
 								socket.close();
-								break;
+								return;
 							}
 						}
 						
+						removeDeadThreads();
 						constructList();
 							
 						for(int i=0; i<thread_list.size(); i++)
@@ -138,7 +139,7 @@ public class Server {
 					}
 			} catch (IOException e) {
 				System.out.println("Lost connection with a user.");
-				e.printStackTrace();
+				//e.printStackTrace();
 				
 				for(int i=0; i<thread_list.size(); i++)
 				{
@@ -153,9 +154,8 @@ public class Server {
 						DataOutputStream dos = new DataOutputStream(thread_list.get(i).socket.getOutputStream());
 						dos.writeUTF("Left`"+this.getThreadName());
 						dos.writeUTF(client_list);
-						System.out.println(client_list);
 					} catch(IOException t) {
-						t.printStackTrace();		
+						//t.printStackTrace();		
 					}
 				}				
 				
@@ -170,7 +170,7 @@ public class Server {
 								dos.writeUTF("Changed`"+thread_list.get(0).getThreadName());
 								dos.writeUTF("Unmuted All`"+"dummy");
 							} catch(IOException s) {
-								s.printStackTrace();		
+								//s.printStackTrace();		
 							}
 						}
 					}	

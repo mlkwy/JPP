@@ -1,16 +1,11 @@
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,11 +13,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 public class ChatRoomFrame extends JFrame{
 	private static final long serialVersionUID = 1L;
+	
 	Socket socket;
 	String name;
 	Boolean is_leader;
@@ -41,12 +36,11 @@ public class ChatRoomFrame extends JFrame{
 	JButton send_button;
 	JButton mute_button;
 	
-	ChatRoomFrame(Socket socket, String name, Boolean is_leader, ArrayList<String> client_list){
-		this.socket=socket;
-		this.name=name;
-		this.is_leader=is_leader;
-		this.client_list=client_list;
-		
+	ChatRoomFrame(){
+		this.socket=Client.socket;
+		this.name=Client.name;
+		this.is_leader=Client.is_leader;
+		ChatRoomFrame.client_list=Client.client_list;
 		
 		
 		setTitle("Chat Room");
@@ -78,7 +72,7 @@ public class ChatRoomFrame extends JFrame{
 		scroll = new JScrollPane(message_area, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scroll.setPreferredSize(new Dimension(10, 50));
 		scroll.setBounds(390, 0, 10, 50);
-		// 수정해야 할 부분 : 스크롤 
+		// 수정해야 할 부분 : 스크롤
 		
 		
 		panel2 = new JPanel();
@@ -117,7 +111,7 @@ public class ChatRoomFrame extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				String message = textfield.getText();
 				
-				if(!message.equals("") && !message.equals(name) && ChatRoomFrame.client_list.contains(message.trim()))
+				if(!message.equals("") && !message.equals(name) && Client.client_list.contains(message.trim()))
 				{					
 					message_area.append("You muted / unmuted " + message + ".\n");
 					message = "Muted`" + message;
@@ -128,7 +122,6 @@ public class ChatRoomFrame extends JFrame{
 			}
 		});
 		
-	
 		
 		panel0.add(header);
 		panel1.add(message_area);
@@ -190,17 +183,6 @@ public class ChatRoomFrame extends JFrame{
 	
 		is_leader = !is_leader;
 		panel2.validate();
-	}
-	
-	public void setList(ArrayList<String> client_list)
-	{
-		ArrayList<String> new_list=new ArrayList<String>();
-		for(int i=0; i<client_list.size(); i++)
-			new_list.add(client_list.get(i));
-		
-		this.client_list=new_list;
-		for(int i=0; i<client_list.size(); i++)
-			System.out.println(client_list.get(i));
 	}
 }
 
