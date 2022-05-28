@@ -3,57 +3,87 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class Client {
-	private Socket socket;
-	private static String name;
-	public Boolean is_leader;
-	public Boolean is_muted;
+	static Socket socket;
 	
+	static ChatRoomFrame client_frame;
+	
+	static String name;
+	static Boolean is_leader;
+	static Boolean is_muted;
+	static ArrayList<String> client_list;
+
 	public static void main(String args[]) throws UnknownHostException, IOException
 	{	
-		Scanner scn = new Scanner(System.in);
-		name = scn.nextLine();
-		Socket socket = new Socket("localhost", 100);
-		new ReceiveFromServer(socket).start();
-		new SendToServer(socket).start();
+		is_leader=false;
+		is_muted=false;
+		client_list=new ArrayList<String>();
+		
+		name = "Kidm";
+		socket = new Socket("localhost", 100);
+		
+		client_frame=new ChatRoomFrame(socket, name, is_leader, client_list);
+		
+		new SendToServer(socket, "Joined`"+getName()).start();
+		new ReceiveFromServer(socket, client_frame).start();
 	}
 
-	public Socket getSocket() {
-		return socket;
-	}
-
-	public void setSocket(Socket socket) {
-		this.socket = socket;
-	}
 	
 	public static String getName() {
 		return Client.name;
 	}
 	
-	public void setName(String name) {
+	public static void setName(String name) {
 		Client.name = name;
 	}
+	
+	public static Boolean isLeader() {
+		return is_leader;
+	}
+	
+	public static void setLeader() {
+		is_leader=!is_leader;
+	}
+	
+	public static Boolean isMuted() {
+		return is_muted;
+	}
+	
+	public static void setMuted() {
+		is_muted=!is_muted;
+	}
+
 }
 
 class SendToServer extends Thread {
 	private Socket socket;
+	private String message;
 	
-	public SendToServer(Socket socket) {
+	public SendToServer(Socket socket, String message) {
 		this.socket=socket;
+		this.message=message;
 	}
 	
 	public void run( ) {
 		try {
-			Scanner scn = new Scanner(System.in);
-			String input = scn.nextLine();
-			String sent_message = "Message:" + Client.getName() + ":" + input;
-			
 			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-			dos.writeUTF(sent_message);
-			new SendToServer(socket).start();
+			dos.writeUTF(message);
 		}catch (IOException e)
 		{
 			e.printStackTrace();
@@ -63,19 +93,19 @@ class SendToServer extends Thread {
 
 class ReceiveFromServer extends Thread {
 	private Socket socket;
+	private ChatRoomFrame client_frame;
 	
-	public ReceiveFromServer(Socket socket)
-	{
+	public ReceiveFromServer(Socket socket, ChatRoomFrame client_frame) {
 		this.socket=socket;
+		this.client_frame=client_frame;
 	}
 	
 	public void run ( ) { 
 		try {
 			DataInputStream dis = new DataInputStream(socket.getInputStream());
 			String arrived=dis.readUTF();
-			
-			// 1 : Message 2 : Joined 3: Left 4 : Muted 5 : Unmuted 6 : Leader changed
-			StringTokenizer st = new StringTokenizer(arrived, ":");
+		
+			StringTokenizer st = new StringTokenizer(arrived, "`");
 			String command = st.nextToken();
 			String name = st.nextToken();
 			String message = "";
@@ -84,28 +114,73 @@ class ReceiveFromServer extends Thread {
 			
 			String printed_message = "";
 			if(command.equals("Message"))
-				printed_message = name + ": " + message;
+			{
+				if(name.equals(Client.getName()))
+					printed_message = "Me: " + message;
+				else
+					printed_message = name + ": " + message;
+			}
 				
 			else if(command.equals("Joined"))
 				printed_message = name + " joined the chatroom.";
+
 		
 			else if(command.equals("Left"))
-				printed_message = name + " left the chatroom";
+				printed_message = name + " left the chatroom.";
 			
-			else if(command.equals("Muted"))
-				printed_message = "The leader muted " + name + ".";
-			
-			else if(command.equals("Unmuted"))
-				printed_message = "The leader unmuted " + name + ".";
-			
-			else
-				printed_message = name + " is the new leader of the chatroom.";
+			else if(command.equals("Muted") && name.equals(Client.getName()) && !Client.isLeader())
+			{
+					
+				if(Client.isMuted())
+					printed_message = "The leader unmuted you.";
+				else
+					printed_message = "The leader muted you.";
+					
+				client_frame.send_button.setEnabled(!client_frame.send_button.isEnabled());	
+				Client.setMuted();
+			}
 				
-				
-			System.out.println(printed_message);
 			
-			//dis.close();
-			new ReceiveFromServer(socket).start();
+			else if(command.equals("Unmuted All")) {
+				printed_message = "All users are unmuted.";
+				if(Client.isMuted())
+				{
+					client_frame.send_button.setEnabled(true);
+					Client.setMuted();
+				}
+			}
+			
+			else if(command.equals("Changed"))
+			{
+				if(name.equals(Client.getName()))
+				{
+					Client.setLeader();
+					printed_message = "You are the new leader of the chatroom.";
+					client_frame.alterLayout();
+				}
+				
+				else
+					printed_message = name + " is the new leader of the chatroom.";
+				
+			}
+			
+			else if(command.equals("List"))
+			{
+				System.out.println(name);
+				StringTokenizer token = new StringTokenizer(name, ",");
+				Client.client_list=new ArrayList<String>();
+				while(token.hasMoreTokens())
+				{
+					String s = token.nextToken();
+					Client.client_list.add(s.trim());
+				}
+				client_frame.setList(Client.client_list);
+			}
+			
+			if(!printed_message.equals(""))
+				client_frame.message_area.append(printed_message+"\n");
+			new ReceiveFromServer(socket, client_frame).start();
+			
 		}catch (IOException e)
 		{
 			e.printStackTrace();
