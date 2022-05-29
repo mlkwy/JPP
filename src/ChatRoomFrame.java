@@ -70,8 +70,8 @@ public class ChatRoomFrame extends JFrame{
 		message_area.setEditable(false);
 		message_area.setBounds(10, 0, 380, 490);
 		scroll = new JScrollPane(message_area, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scroll.setPreferredSize(new Dimension(10, 490));
-		scroll.setBounds(390, 0, 10, 490);
+		scroll.setPreferredSize(new Dimension(390, 490));
+		scroll.setBounds(10, 0, 390, 490);
 		
 		
 		panel2 = new JPanel();
@@ -123,7 +123,7 @@ public class ChatRoomFrame extends JFrame{
 		
 		
 		panel0.add(header);
-		panel1.add(message_area);
+		//panel1.add(message_area);
 		panel1.add(scroll);
 		panel2.add(textfield);
 		panel2.add(send_button);
