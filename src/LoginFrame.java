@@ -4,8 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.TimeUnit;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -62,6 +60,7 @@ public class LoginFrame extends JFrame{
 						}
 						
 						else {
+							@SuppressWarnings("unused")
 							Client client = new Client(socket, name);
 							dispose();
 						}
@@ -90,6 +89,7 @@ public class LoginFrame extends JFrame{
 		setVisible(true);
 	}
 	
+	@SuppressWarnings("unused")
 	public static void main(String args[])
 	{
 		LoginFrame loginframe = new LoginFrame();
