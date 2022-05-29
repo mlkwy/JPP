@@ -70,9 +70,8 @@ public class ChatRoomFrame extends JFrame{
 		message_area.setEditable(false);
 		message_area.setBounds(10, 0, 380, 490);
 		scroll = new JScrollPane(message_area, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scroll.setPreferredSize(new Dimension(10, 50));
-		scroll.setBounds(390, 0, 10, 50);
-		// 수정해야 할 부분 : 스크롤
+		scroll.setPreferredSize(new Dimension(10, 490));
+		scroll.setBounds(390, 0, 10, 490);
 		
 		
 		panel2 = new JPanel();

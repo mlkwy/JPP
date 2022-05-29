@@ -1,3 +1,4 @@
+// Redundant Class! This is not used.
 
 public class User {
 	String name;
