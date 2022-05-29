@@ -153,6 +153,7 @@ class ReceiveFromServer extends Thread {
 			
 			if(!printed_message.equals(""))
 				client_frame.message_area.append(printed_message+"\n");
+				client_frame.scroll.getVerticalScrollBar().setValue(client_frame.scroll.getVerticalScrollBar().getMaximum());
 			new ReceiveFromServer(socket, client_frame).start();
 			
 		}catch (IOException e)
